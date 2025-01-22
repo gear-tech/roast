@@ -18,6 +18,11 @@ use frost_core::{
 };
 use hkdf::{hmac::SimpleHmac, Hkdf};
 use rand_core::{CryptoRng, RngCore};
+#[cfg(all(feature = "serialization", feature = "codec"))]
+use scale_info::{
+    scale::{self, Decode, Encode},
+    TypeInfo,
+};
 
 fn diffie_hellman<C: Ciphersuite>(
     secret_key: &SigningKey<C>,
@@ -94,6 +99,7 @@ type Round1Package<C> = (round1::Package<C>, VerifyingKey<C>);
 
 /// Represents all possible Distributed Key Generation statuses.
 #[derive(Debug)]
+#[cfg_attr(all(feature = "serialization", feature = "codec"), derive(Encode, Decode, TypeInfo), codec(crate = scale))]
 pub enum DkgStatus {
     /// Distributed Key Generation still in progress.
     InProgress,
@@ -107,6 +113,7 @@ pub enum DkgStatus {
 
 /// Represents dealer that can be used for Distributed Key Generation.
 #[derive(Debug)]
+#[cfg_attr(all(feature = "serialization", feature = "codec"), derive(Encode, Decode, TypeInfo), codec(crate = scale))] //TODO: fix TypeInfo
 pub struct Dealer<C: Ciphersuite, H: Clone + BlockSizeUser + Digest> {
     max_signers: u16,
     min_signers: u16,
